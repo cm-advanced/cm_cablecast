@@ -1,0 +1,15 @@
+name = CMA Cablecast
+description = Provides Tightrope Cablecast integration for Community Media facilities. Integrates with the Community Media Project and Show modules.
+package = Community Media
+core = 7.x
+
+package = Community Media Advanced
+version = 7.x-3.0
+project = "cm_cablecast"
+project_status_url = https://github.com/cm-advanced/cm_cablecast
+
+dependencies[] = og
+dependencies[] = entity
+dependencies[] = cablecast_api
+files[] = cm_cablecast.install
+files[] = cm_cablecast.module

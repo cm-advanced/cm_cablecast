@@ -4,7 +4,7 @@ package = Community Media
 core = 7.x
 
 package = Community Media Advanced
-version = 7.x-3.0
+version = 7.x-3.2
 project = "cm_cablecast"
 project_status_url = https://github.com/cm-advanced/cm_cablecast
 

@@ -9,6 +9,8 @@ include_once(drupal_get_path('module', 'cablecast_api') . '/cablecast_api.api.in
 
 /**
  * Implements hook_permission().
+ * 
+ * Defines the ‘administer cablecast’ permission
  */
 function cablecast_api_permission() {
   $permissions = array(
@@ -25,6 +27,8 @@ function cablecast_api_permission() {
 /**
  * Implements hook_menu()
  *
+ * Provides a menu item for a settings page
+ * 
  * @return array
  */
 function cablecast_api_menu() {
@@ -54,7 +58,10 @@ function cablecast_api_menu() {
 }
 
 /**
- * Builds the admininstration settings form.
+ * Menu Item settings page callback function. 
+ * 
+ * Provides settings form elements for  Cablecast Authenticating plus 
+ * allowing the user to pick the Cablecast location and timezone.  
  */
 function cablecast_api_admin_settings($form, &$form_state) {
   $form = array();
@@ -148,7 +155,13 @@ function cablecast_api_admin_settings($form, &$form_state) {
   return ($form);
 }
 
-
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ * 
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cablecast_api_project_info() {
   $info = array(
     'entity_type'             => 'node',
@@ -185,6 +198,13 @@ function _cablecast_api_project_info() {
   return $info;
 }
 
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ *
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cablecast_api_show_info() {
   $info = array(
     'entity_type' => 'node',
@@ -212,6 +232,13 @@ function _cablecast_api_show_info() {
   return $info;
 }
 
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ * 
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cablecast_api_channel_info() {
   $info = array(
     'entity_type'          => 'taxonomy_term',
@@ -239,7 +266,13 @@ function _cablecast_api_channel_info() {
 
   return $info;
 }
-
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ *
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cablecast_api_producer_info() {
   $info = array(
     'entity_type' => 'user',
@@ -262,6 +295,10 @@ function _cablecast_api_producer_info() {
   return $info;
 }
 
+/**
+ * Creates and returns a new Soap client using the server address in the 
+ * settings plus the path to the WSDL
+ */
 function cablecast_api_get_client() {
   $client = NULL;
   if ($serverAddress = variable_get('cablecast_api_server_address', NULL)) {
@@ -271,7 +308,9 @@ function cablecast_api_get_client() {
 }
 
 /**
- * Sync channels from Cablecast
+ * Only used in the disabled cron auto sync functionality.   
+ *
+ * Written to update Drupal Channel Taxonomy with data from Cablecast
  *
  */
 function _cablecast_api_sync_channels() {
@@ -295,7 +334,12 @@ function _cablecast_api_sync_channels() {
 
 /**
  *
- * Sync a single Cablecast object (from Cablecast to Drupal)
+ * Only used in the disabled cron auto sync functionality.
+ *
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ * 
+ * Helper function to determine if a selected Drupal project is different 
+ * from the Cablecast Project
  *
  * @param $cablecast_object
  *
@@ -361,7 +405,9 @@ function _cablecast_api_sync_cablecast_object($cablecast_object, $mapping) {
 
 
 /**
- * Gets a Drupal user ID from a Cablecast Producer ID if it exists
+ * Gets a Drupal user ID using a Cablecast Producer ID if it exists
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
  *
  * @param $producer_id
  *
@@ -385,8 +431,11 @@ function _cablecast_api_get_user_id($producer_id) {
 
 
 /**
- * Returns a Drupal Project entity id from a Cablecast object ID
+ * Only used in the disabled cron auto sync functionality.
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
  *
+ * Returns a Drupal Project entity id from a Cablecast object ID
  *
  * @param $project_id
  *
@@ -413,6 +462,12 @@ function _cablecast_api_get_drupal_eid($cablecast_id, $info, $key) {
 
 
 /**
+ * Only used in the disabled cron auto sync functionality. 
+ *
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ *
+ * Written to get a cablecast channel ID from a Drupal taxonomy term
+ * 
  * @param $channel_id
  *
  * @param $info
@@ -439,7 +494,9 @@ function _cablecast_api_get_channel_eid($channel_id, $info, $key) {
 
 
 /**
- * Alter a Cablecast date to UTC
+ * Only used in the disabled cron auto sync functionality. 
+ *
+ * Will convert a date to UTC
  *
  * @param $datetime
  *
@@ -465,8 +522,12 @@ function _cablecast_api_alter_date_tz($datetime) {
 }
 
 /**
- * Helper function to determine if a selected Drupal channel (term) is different
- * from the Cablecast channel.
+ * Only used in the disabled cron auto sync functionality.
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ * 
+ * Helper function to determine if a selected Drupal channel (term) is 
+ * different from the Cablecast channel.
  *
  * @param $channel_term
  * @param $channel
@@ -491,9 +552,13 @@ function _cablecast_api_is_channel_changed($entity_wrapper, $project, $mapping) 
 }
 
 /**
- * Helper function to determine if a selected Drupal project is different
+ * Only used in the disabled cron auto sync functionality.
+ * 
+ * Duplicate of function in cm_cablecast: cm_cablecast.module
+ * 
+ * Helper function to determine if a selected Drupal project is different 
  * from the Cablecast Project
- *
+ * 
  * @param $node
  * @param $project
  *
@@ -520,6 +585,12 @@ function _cablecast_api_is_cablecast_object_changed($entity_wrapper, $cablecast_
 
 
 /**
+ * Only used in the disabled cron auto sync functionality.
+ * 
+ * Has an updated duplicate function in:
+ * cm_cablecast:
+ * cm_cablecast.module
+ * 
  * Helper function to determine if a selected Drupal airing is different
  * from the Cablecast run.
  *

@@ -10,6 +10,8 @@ define('CM_CABLECAST_CHANNEL_TID', variable_get('cm_cablecast_channel_vid', 12))
 /**
  * Implements hook_menu()
  *
+ * Provides a menu item for a settings page
+ * 
  * @return array
  */
 function cm_cablecast_menu() {
@@ -28,7 +30,12 @@ function cm_cablecast_menu() {
 }
 
 /**
- * Builds the admininstration settings form.
+ * Menu Item page callback function. 
+ * 
+ * Provides Cablecast configuration options. Includes booleans on whether 
+ * creating/editing/deleting nodes/entities will push data to Cablecast. 
+ * Also provides a way to provide an alternate show field on drupal Airing 
+ * entities
  */
 function cm_cablecast_admin_settings($form, &$form_state) {
   $form = array();
@@ -79,6 +86,13 @@ function cm_cablecast_admin_settings($form, &$form_state) {
 /**
  * Implements hook_form_alter
  *
+ * For forms for:
+ * -Project Nodes
+ * -Show Nodes
+ * -User Profiles
+ * It will disable the associated cablecast ID field for users who don’t 
+ * have ‘administer cablecast’ privs
+ * 
  * @param $form
  * @param $form_state
  * @param $form_id
@@ -104,7 +118,13 @@ function cm_cablecast_form_alter(&$form, &$form_state, $form_id) {
   }
 }
 
-
+/**
+ * Implements hook_node_presave for  project and show nodes  and will call 
+ * the following sync functions:
+ * 
+ * -Project : cm_cablecast_sync_project() 
+ * -Show : cm_cablecast_sync_show()
+ */
 function cm_cablecast_node_presave($node) {
   switch($node->type) {
     case 'cm_project':
@@ -119,7 +139,10 @@ function cm_cablecast_node_presave($node) {
       break;
   }
 }
-
+/**
+ * Implments hook_entity_presave() and will call cm_cablecast_sync_airing() 
+ * for airing entities if pushes are enabled 
+ */
 function cm_cablecast_entity_presave($entity, $type) {
   //http://test.pcmtv.org/Cablecast/Schedule.Runs.Advanced.aspx?scheduleID=59251
   if($type == 'airing') {
@@ -130,7 +153,13 @@ function cm_cablecast_entity_presave($entity, $type) {
     }
   }
 }
-
+/**
+ * Implements hook_entity_delete() for show nodes and airing entities and 
+ * type will call it’s subsequent delete function.
+ * 
+ * -Show cablecast_api_delete_show()
+ * -Airing cablecast_api_delete_airing()
+ */
 function cm_cablecast_entity_delete($entity, $type) {
   if($type == 'airing') {
     if (variable_get('cm_cablecast_push_airing_on_save', 0) == '1') {
@@ -144,6 +173,10 @@ function cm_cablecast_entity_delete($entity, $type) {
 }
 
 /**
+ * Called from cm_cablecast_entity_presave() and determines if we are 
+ * adding/editing an airing and then adds or deletes/re-adds Runs of the Show 
+ * in Cablecast
+ * 
  * @param $show
  *  The Show $node
  *
@@ -306,6 +339,8 @@ function cm_cablecast_sync_project($node) {
 }
 
 /**
+ * Called from cm_cablecast_node_presave() and either adds a new show to 
+ * cablecast or updates an existing one.
  * @param $show
  *  The Show $node
  *
@@ -406,8 +441,10 @@ function cm_cablecast_sync_show($show) {
 
 
 /**
- * Sync Projects from Cablecast
- *
+ * Currently not called.
+ * 
+ * Written to be called from hook_cron() to  update Cablecast Projects using 
+ * all of the Drupal project  nodes
  */
 function _cm_cablecast_sync_projects($channels) {
   watchdog('CM Cablecast', 'Syncing Projects');
@@ -431,8 +468,10 @@ function _cm_cablecast_sync_projects($channels) {
 }
 
 /**
- * Sync Shows from Cablecast
- *
+ * Currently not called.
+ * 
+ * Written to be called from hook_cron() to  update Drupal Show nodes using 
+ * Cablecast Shows updated/created past a certain date.
  */
 function _cm_cablecast_sync_shows() {
   watchdog('CM Cablecast', 'Syncing Shows');
@@ -517,8 +556,12 @@ function _cm_cablecast_sync_shows() {
 }
 
 /**
- * Sync Schedule (Airings) from Cablecast
- *
+ * Currently not called.
+ * 
+ * Written to be called from hook_cron() to  update Drupal Airings by looking 
+ * up the Cablecast Schedule for a range spanning 3 days in past to 30 days in 
+ * future. Airings will be created or updated for each of the cablecast Runs. 
+ * Shows will not be auto created, that happens in cm_cablecast_sync_shows()
  */
 function _cm_cablecast_sync_schedule($channels) {
   watchdog('CM Cablecast', 'Syncing Schedule');
@@ -616,6 +659,7 @@ function _cm_cablecast_sync_schedule($channels) {
 /**
  * Gets a Drupal user ID from a Cablecast Producer ID if it exists
  *
+ * Duplicate of function in cablecast_api: cablecast_api.module
  * @param $producer_id
  *
  * @return mixed
@@ -637,7 +681,9 @@ function _cm_cablecast_get_user_id($producer_id) {
 }
 
 /**
- * Helper function to retreive the Cablecast Producer ID of a node's author
+ * Called from cm_cablecast_sync_show() and cm_cablecast_sync_project()
+ * 
+ * It will either add a new Cablecast Producer or update an existing one
  *
  * @param  $user (int)
  *  The user id of the Drupal user to sync to Cablecast
@@ -716,6 +762,10 @@ function cm_cablecast_sync_producer($user_id) {
 }
 
 /**
+ * Only used in the disabled cron auto sync functionality.
+ *
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ *
  * Returns a Drupal Project entity id from a Cablecast object ID
  *
  *
@@ -744,6 +794,12 @@ function _cm_cablecast_get_drupal_eid($cablecast_id, $info, $key) {
 
 
 /**
+ * Only used in the disabled cron auto sync functionality. 
+ * 
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ *
+ * 
+ * Written to get a cablecast channel ID from a Drupal taxonomy term
  * @param $channel_id
  *
  * @param $info
@@ -768,6 +824,8 @@ function _cm_cablecast_get_channel_eid($channel_id, $info, $key) {
 }
 
 /**
+ * Returns a Drupal Show NID using the value for field field_cablecast_show_id 
+ * as a search term
  * @param $show_id
  *
  * @return mixed
@@ -789,6 +847,10 @@ function _cm_cablecast_get_show_nid($show_id) {
 }
 
 /**
+ * Only used in the disabled cron auto sync functionality.
+ *
+ * Returns a Drupal Airing entity id by searching for an entity with a 
+ * matching value set for the field field_cablecast_airing_id
  * @param $schedule_id
  *
  * @return mixed
@@ -808,8 +870,12 @@ function _cm_cablecast_get_airing_eid($schedule_id) {
 }
 
 /**
- * Helper function to determine if a selected Drupal channel (term) is different
- * from the Cablecast channel.
+ * Only used in the disabled cron auto sync functionality.
+ *
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ *
+ * Helper function to determine if a selected Drupal channel (term) is 
+ * different from the Cablecast channel.
  *
  * @param $channel_term
  * @param $channel
@@ -834,6 +900,10 @@ function _cm_cablecast_is_channel_changed($entity_wrapper, $project, $mapping) {
 }
 
 /**
+ * Only used in the disabled cron auto sync functionality.
+ *
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ * 
  * Helper function to determine if a selected Drupal project is different
  * from the Cablecast Project
  *
@@ -953,9 +1023,10 @@ function cm_cablecast_get_single_field_value($entity, $field_name,
 }
 
 /**
- * Implements hook_cron
- *
- * Pulls Channels and "Runs" from Cablecast
+ * Implements hook_cron() but currently everything is commented out.
+ * 
+ * Looks like it was originally written to auto sync Drupal Projects, Shows, 
+ * and Airings with Cablecast schedule info
  */
 function cm_cablecast_cron() {
   // see if we can talk to the Cablecast server, if not there is no need to continue
@@ -967,6 +1038,10 @@ function cm_cablecast_cron() {
   //}
 }
 
+/**
+ * Called from cm_cablecast_sync_airing() and it return the unique Cablecast 
+ * ID from the channel
+ */
 function cm_cablecast_convert_channel_tid_to_name($tid) {
   
   $term = taxonomy_term_load($tid);
@@ -980,8 +1055,13 @@ function cm_cablecast_convert_channel_tid_to_name($tid) {
   return $cc_channel_id;
 }
 
-// START MAPPINGS
-// NOT SURE THESE WERE EVER USED, BUT IDEA IS SIMILAR TO TELVUE MAPPINGS
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ * 
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cm_cablecast_project_info() {
   $info = array(
     'entity_type'             => 'node',
@@ -1017,7 +1097,13 @@ function _cm_cablecast_project_info() {
   );
   return $info;
 }
-
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ * 
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ *
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cm_cablecast_show_info() {
   $info = array(
     'entity_type' => 'node',
@@ -1045,6 +1131,13 @@ function _cm_cablecast_show_info() {
   return $info;
 }
 
+/*
+ * Only used in the disabled cron auto sync functionality.  
+ *
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ *
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cm_cablecast_channel_info() {
   $info = array(
     'entity_type'          => 'taxonomy_term',
@@ -1073,6 +1166,13 @@ function _cm_cablecast_channel_info() {
   return $info;
 }
 
+/**
+ * Only used in the disabled cron auto sync functionality.  
+ *
+ * Duplicate of function in cablecast_api: cablecast_api.module
+ * 
+ * Intended to map Drupal fields to Cablecast fields
+ */
 function _cm_cablecast_producer_info() {
   $info = array(
     'entity_type' => 'user',

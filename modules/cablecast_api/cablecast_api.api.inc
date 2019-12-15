@@ -8,6 +8,12 @@
 /**
  * Cablecast server query
  *
+ * Method creates a new Soap Client and then executes the $method method that 
+ * is passed in using the param variables in the $data array. It catches any 
+ * Soap Exceptions and logs them. 
+ * 
+ * This function is used for all interactions with Cablecast. 
+ * 
  * @param $method
  * @param array $data
  * @return mixed
@@ -51,6 +57,9 @@ function cablecast_api_server_query($method, $data) {
 /**
  * Creates a new Producer on Cablecast
  *
+ * Builds $data array in order to execute the ‘CreateNewProducer’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  *
  * @return $result
@@ -95,6 +104,9 @@ function cablecast_api_add_producer($user) {
 /**
  * Updates a Producer on Cablecast
  *
+ * Builds $data array in order to execute the ‘UpdateProducer’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $result
  */
@@ -147,6 +159,9 @@ function cablecast_api_update_producer($user) {
 /**
  * Retrieve a Producer from Cablecast
  *
+ * Builds $data array in order to execute the ‘GetProducerInfo’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -172,6 +187,9 @@ function cablecast_api_get_producer($user) {
 /**
  * Retrieve a Producer from Cablecast
  *
+ * Builds $data array in order to execute the ‘GetProducerInfo’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -196,6 +214,9 @@ function cablecast_api_get_producer_object($id) {
 /**
  * Retrieve a Producer ID from Cablecast
  *
+ * Builds $data array in order to execute the ‘GetProducerInfo’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -220,6 +241,9 @@ function cablecast_api_get_producer_from_id($uid) {
 /**
  * Create a Project on Cablecast
  *
+ * Builds $data array in order to execute the ‘CreateNewProject’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -264,6 +288,9 @@ function cablecast_api_add_project($node) {
 /**
  * Updates a Project on Cablecast
  *
+ * Builds $data array in order to execute the ‘cablecast_api_get_projects()’ 
+ * Cablecast method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -314,6 +341,11 @@ function cablecast_api_update_project($node) {
  * Retrieves all Projects from Cablecast
  * Cablecast lacks a method to get a single Project
  *
+ * Builds $data array in order to execute the ‘GetProjects’ Cablecast method 
+ * via cablecast_api_server_query(). If multiple projects are found only the 
+ * first one is returned. Cablecast does not have a “find single project’ 
+ * method
+ * 
  * @param $data
  *
  * @return bool $return
@@ -346,6 +378,11 @@ function cablecast_api_get_projects($node) {
  * Retrieves all Projects from Cablecast
  * Cablecast lacks a method to get a single Project
  *
+ * Builds $data array in order to execute the ‘GetProjects’ Cablecast 
+ * method via cablecast_api_server_query(). If multiple projects are found 
+ * only the first one is returned. Cablecast does not have a “find single 
+ * project’ method
+ * 
  * @param $data
  *
  * @return bool $return
@@ -378,6 +415,11 @@ function cablecast_api_get_project_from_id($project_id) {
  * and looping until a id match. There is no direct fetch of a project in the 
  * cablecast api.
  *
+ * Builds $data array in order to execute the ‘GetProjects’ Cablecast method 
+ * via cablecast_api_server_query(). If multiple projects are found only the 
+ * first one is returned. Cablecast does not have a “find single project’ 
+ * method
+ * 
  * @param $data
  *
  * @return bool $return
@@ -408,6 +450,11 @@ function cablecast_api_get_project($project_id) {
  *
  * Adds a Show to Cablecast
  *
+ * Builds $data array in order to execute the ‘CreateNewShowRecord’ 
+ * Cablecast method via cablecast_api_server_query(). Method defines and 
+ * calls the hook ‘hook_cablecast_show_presave()’ that is defined in 
+ * pcm_show.module
+ * 
  * @param $data
  * @return $return
  */
@@ -526,6 +573,10 @@ function cablecast_api_add_show($node) {
  * Updates an existing Show Record. All fields are required.
  * Blank or empty fields will overwrite existing show data.
  *
+ * Builds $data array in order to execute the ‘UpdateShowRecord’ Cablecast 
+ * method via cablecast_api_server_query().  Method defines and calls the 
+ * hook ‘hook_cablecast_show_presave()’ that is defined in pcm_show.module
+ * 
  * @param $data
  * @return $return
  */
@@ -624,6 +675,10 @@ function cablecast_api_update_show($node) {
  * Updates an existing Schedule Record. All fields are required.
  * Blank or empty fields will overwrite existing show data.
  *
+ * Builds $data array in order to execute the ‘AddScheduleEvent’ Cablecast 
+ * method via cablecast_api_server_query(). It will add a Run of the 
+ * Cablecast Show.
+ * 
  * @param $data
  * @return $return
  */
@@ -688,6 +743,9 @@ function cablecast_api_add_airing($airing, $cablecast_show_id, $channel_name) {
 /**
  * Returns a Cablecast ScheduleEvent for a Drupal Airing 
  *
+ * Builds $data array in order to execute the ‘GetScheduleInformation’ 
+ * Cablecast method via cablecast_api_server_query()
+ * 
  * @param $airing
  * @return $return
  */
@@ -767,6 +825,10 @@ function cablecast_api_get_airing($airing) {
 /**
  * @param $show
  *
+ * Builds $data array in order to execute the ‘UpdateShowRecord’ Cablecast 
+ * method via cablecast_api_server_query(). The method does not delete the 
+ * show, but changed Title and removes all metadata from the show. 
+ * 
  * Until the cablecast api supports show deletion, we will just empty
  * out the show and save it so it doesn't get in the way
  */
@@ -834,7 +896,8 @@ function cablecast_api_delete_show($show) {
 
 }
 /**
-
+ * Builds $data array in order to execute the ‘RemoveScheduleEvent’ Cablecast 
+ * method via cablecast_api_server_query()
  *
  * @param $airing
  * @return $return
@@ -878,6 +941,9 @@ function cablecast_api_delete_airing($airing) {
 /**
  * Updates a Show on Cablecast
  *
+ * Builds $data array in order to execute the ‘GetShowInformation’ Cablecast 
+ * method via cablecast_api_server_query()
+ * 
  * @param $data
  * @return $return
  */
@@ -900,6 +966,11 @@ function cablecast_api_get_show($node) {
  * Returns shows at this site that were modified in the range requested by the
  * SearchDate and DateComarator. DateComparator is a string consisting of
  * "<", ">", "<=", or ">="
+ * 
+ * Only used in the disabled cron auto sync functionality. 
+ * 
+ * Builds $data array in order to execute the ‘LastModifiedSearch’ Cablecast 
+ * method via cablecast_api_server_query()
  */
 function cablecast_api_last_modified_search($data) {
   /*
@@ -915,6 +986,11 @@ function cablecast_api_last_modified_search($data) {
 /**
  * Returns a list of all the channels on this Cablecast server.
  *
+ * Only used in the disabled cron auto sync functionality. 
+ *
+ * Builds $data array in order to execute the ‘GetChannels’ Cablecast method 
+ * via cablecast_api_server_query()
+ * 
  * @return mixed
  */
 function cablecast_api_get_channels() {
@@ -927,7 +1003,10 @@ function cablecast_api_get_channels() {
   return $return->GetChannelsResult->Channel;
 
 }
-
+/**
+ * Builds $data array in order to execute the ‘GetScheduleInformation’ 
+ * Cablecast method via cablecast_api_server_query()
+ */
 function cablecast_api_get_schedule($data) {
   /*
        <GetScheduleInformation xmlns="http://www.trms.com/CablecastWS/">
@@ -942,7 +1021,10 @@ function cablecast_api_get_schedule($data) {
   return $return->GetScheduleInformationResult->ScheduleInfo;
 
 }
-
+/**
+ * Builds $data array in order to execute the ‘DataVersion’ Cablecast method 
+ * via cablecast_api_server_query()
+ */
 function cablecast_api_get_version() {
   if (!variable_get('cablecast_api_server_address', NULL)) {
     drupal_set_message(t('<a href="@url">Cablecast API must be configured.</a>', array('@url' => url('admin/config/cablecast-api'))), 'error');
@@ -950,7 +1032,10 @@ function cablecast_api_get_version() {
   }
   return cablecast_api_server_query('DataVersion', $data = array())->DataVersionResult;
 }
-
+/**
+ *Builds $data array in order to execute the ‘GetLocations’ Cablecast method 
+ * via cablecast_api_server_query()
+ */
 function cablecast_api_get_locations() {
   return cablecast_api_server_query('GetLocations', $data = array());
 }

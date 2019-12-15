@@ -248,7 +248,7 @@ function cablecast_api_add_project($node) {
   // setup data array for SOAP call
   $data = array(
     'LocationID'          => 1,
-    'Name'                => check_plain($node->title),
+    'Name'                => $node->title,
     'Description'         => '',
     'ProducerID'          => $cc_producer_id,
     'Podcast'             => FALSE,
@@ -298,7 +298,7 @@ function cablecast_api_update_project($node) {
   // setup data array for SOAP call
   $data = array(
 		'ProjectID'           => $cc_project_id,
-		'Name'                => check_plain($node->title),
+		'Name'                => $node->title,
 		'Description'         => '',
 		'ProducerID'          => $cc_producer_id,
 		'Podcast'             => FALSE,
@@ -495,8 +495,8 @@ function cablecast_api_add_show($node) {
   $data = array(
     'LocalID'               => "Added by API",
     'LocationID'            => 1,
-    'Title'                 => check_plain($node->title),
-    'CGTitle'               => check_plain($node->title),
+    'Title'                 => $node->title,
+    'CGTitle'               => $node->title,
     'ProjectID'             => $cc_project_id,
     // TODO: may vary based on project type or other criteria
     'CGExempt'              => FALSE, 
@@ -592,8 +592,8 @@ function cablecast_api_update_show($node) {
 		'ShowID'                => $cc_show_id,
 		'LocalID'               => "Added by API",
 		'LocationID'            => 1,
-		'Title'                 => check_plain($node->title),
-		'CGTitle'               => check_plain($node->title),
+		'Title'                 => $node->title,
+		'CGTitle'               => $node->title,
 		'ProjectID'             => $cc_project_id,
 		// TODO: may vary based on project type or other criteria
 		'CGExempt'              => FALSE, 

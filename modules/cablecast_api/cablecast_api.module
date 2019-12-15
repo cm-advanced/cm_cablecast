@@ -307,7 +307,7 @@ function _cablecast_api_sync_cablecast_object($cablecast_object, $mapping) {
   $entity_info = entity_get_info($mapping['entity_type']);
 
   //See if we already have the entity in drupal
-  $eid = _cablecast_api_get_drupal_eid($cablecast_object->$mapping['cablecast_id'], $mapping, $entity_info['entity keys']['id']);
+  $eid = _cablecast_api_get_drupal_eid($cablecast_object->{$mapping['cablecast_id']}, $mapping, $entity_info['entity keys']['id']);
 
   if($eid == false) {
     if ($mapping['entity_type'] == 'taxonomy_term') {
@@ -341,7 +341,7 @@ function _cablecast_api_sync_cablecast_object($cablecast_object, $mapping) {
   if ($eid == false || _cablecast_api_is_cablecast_object_changed($entity_wrapper, $cablecast_object, $mapping)) {
       foreach ($mapping['fields'] as $cablecast_field => $field_settings) {
         if ($field_settings['drupal_field']) {
-          $field_wrapper = $entity_wrapper->$field_settings['drupal_field'];
+          $field_wrapper = $entity_wrapper->{$field_settings['drupal_field']};
           if ($entity_wrapper->type() == 'taxonomy_term') {
             $field_wrapper->set($cablecast_object->$cablecast_field);
           } else {
@@ -502,13 +502,13 @@ function _cablecast_api_is_channel_changed($entity_wrapper, $project, $mapping) 
 function _cablecast_api_is_cablecast_object_changed($entity_wrapper, $cablecast_object, $mapping) {
   foreach ($mapping['fields'] as $cablecast_field => $field_settings) {
     if ($field_settings['drupal_field']) {
-      $field_info = $entity_wrapper->$field_settings['drupal_field']->info();
+      $field_info = $entity_wrapper->{$field_settings['drupal_field']}->info();
       if (isset($field_info['property info'])) {
         // a multi-valued field.
-        $value = $entity_wrapper->$field_settings['drupal_field']->value->value();
+        $value = $entity_wrapper->{$field_settings['drupal_field']}->value->value();
       } else {
         // a single-valued field
-        $value = $entity_wrapper->$field_settings['drupal_field']->raw();
+        $value = $entity_wrapper->{$field_settings['drupal_field']}->raw();
       }
       if ($value != $cablecast_object->$cablecast_field ) {
         return true;

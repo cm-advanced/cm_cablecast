@@ -88,17 +88,17 @@ function cm_cablecast_form_alter(&$form, &$form_state, $form_id) {
   switch($form_id) {
     case 'cm_project_node_form':
       if(!user_access('administer cablecast')) {
-        $form['field_cablecast_project_id']['#type'] = 'hidden';
+        $form['field_cablecast_project_id']['#access'] = FALSE;
       }
       break;
     case 'cm_show_node_form':
       if(!user_access('administer cablecast')) {
-        $form['field_cablecast_show_id']['#type'] = 'hidden';
+        $form['field_cablecast_show_id']['#access'] = FALSE;
       }
       break;
     case 'user_profile_form':
       if(!user_access('administer cablecast')) {
-        $form['field_cablecast_producer_id']['#type'] = 'hidden';
+        $form['field_cablecast_producer_id']['#access'] = FALSE;
       }
       break;
   }
@@ -845,13 +845,13 @@ function _cm_cablecast_is_channel_changed($entity_wrapper, $project, $mapping) {
 function _cm_cablecast_is_cablecast_object_changed($entity_wrapper, $cablecast_object, $mapping) {
   foreach ($mapping['fields'] as $cablecast_field => $field_settings) {
     if ($field_settings['drupal_field']) {
-      $field_info = $entity_wrapper->$field_settings['drupal_field']->info();
+      $field_info = $entity_wrapper->{$field_settings['drupal_field']}->info();
       if (isset($field_info['property info'])) {
         // a multi-valued field.
-        $value = $entity_wrapper->$field_settings['drupal_field']->value->value();
+        $value = $entity_wrapper->{$field_settings['drupal_field']}->value->value();
       } else {
         // a single-valued field
-        $value = $entity_wrapper->$field_settings['drupal_field']->raw();
+        $value = $entity_wrapper->{$field_settings['drupal_field']}->raw();
       }
       if ($value != $cablecast_object->$cablecast_field ) {
         return true;
